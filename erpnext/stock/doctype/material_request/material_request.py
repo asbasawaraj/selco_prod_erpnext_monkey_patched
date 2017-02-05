@@ -6,6 +6,7 @@
 
 from __future__ import unicode_literals
 import frappe
+import operator
 
 from frappe.utils import cstr, flt, getdate, new_line_sep
 from frappe import msgprint, _
@@ -78,6 +79,23 @@ class MaterialRequest(BuyingController):
 		# self.validate_qty_against_so()
 		# NOTE: Since Item BOM and FG quantities are combined, using current data, it cannot be validated
 		# Though the creation of Material Request from a Production Plan can be rethought to fix this
+
+		#Start of Insert By Poorvi on 10-09-2016 for IBM value calculation
+		selco_ibm_value = 0
+		#if self.workflow_state =="Approval Pending by SM - IBM":
+		for idx,selco_item in enumerate(self.items):
+			selco_rate = frappe.db.sql("""select price_list_rate
+				from `tabItem Price`
+				where item_code = %s and price_list = "Branch Sales" """,(selco_item.item_code))
+			if selco_rate:
+				var1=selco_rate[0][0]
+			else:
+				var1=0
+			self.items[idx].selco_rate =var1
+			selco_ibm_value = selco_ibm_value + (var1 * selco_item.qty)
+		self.selco_ibm_value = selco_ibm_value
+		#self.items.sort(key = lambda x: x.item_code)
+		self.items.sort(key=operator.attrgetter("item_code"), reverse=False)
 
 	def on_submit(self):
 		frappe.db.set(self, 'status', 'Submitted')

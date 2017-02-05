@@ -9,6 +9,7 @@ from frappe.utils import flt
 from erpnext.setup.utils import get_company_currency
 from erpnext.accounts.party import get_party_details
 from erpnext.stock.get_item_details import get_conversion_factor
+from frappe.utils import cint, flt, cstr, comma_or
 
 from erpnext.controllers.stock_controller import StockController
 
@@ -59,13 +60,26 @@ class BuyingController(StockController):
 			if tax_for_valuation:
 				frappe.throw(_("Tax Category can not be 'Valuation' or 'Valuation and Total' as all items are non-stock items"))
 
-	def set_total_in_words(self):
+	"""def set_total_in_words(self):
 		from frappe.utils import money_in_words
 		company_currency = get_company_currency(self.company)
 		if self.meta.get_field("base_in_words"):
 			self.base_in_words = money_in_words(self.base_grand_total, company_currency)
 		if self.meta.get_field("in_words"):
-			self.in_words = money_in_words(self.grand_total, self.currency)
+			self.in_words = money_in_words(self.grand_total, self.currency)"""
+
+	def set_total_in_words(self):
+		from frappe.utils import money_in_words
+		company_currency = get_company_currency(self.company)
+
+		disable_rounded_total = cint(frappe.db.get_value("Global Defaults", None, "disable_rounded_total"))
+
+		if self.meta.get_field("base_in_words"):
+			self.base_in_words = money_in_words(disable_rounded_total and
+				abs(self.base_grand_total) or abs(self.base_rounded_total), company_currency)
+		if self.meta.get_field("in_words"):
+			self.in_words = money_in_words(disable_rounded_total and
+				abs(self.base_rounded_total) or abs(self.base_rounded_total), self.currency)
 
 	# update valuation rate
 	def update_valuation_rate(self, parentfield):

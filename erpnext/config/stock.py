@@ -55,6 +55,14 @@ def get_data():
 					"name": "Stock Ageing",
 					"doctype": "Item",
 				},
+				{
+                	"type": "report",
+					"name": "Stock Balance - HO",
+					"label": _("Stock Balance - HO"),
+					"doctype": "Stock Ledger Entry",
+					"is_query_report": True,
+					"icon": "icon-bar-chart"
+				}
 
 			]
 		},

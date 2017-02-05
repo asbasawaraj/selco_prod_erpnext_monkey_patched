@@ -344,6 +344,7 @@ def get_invoiced_qty_map(delivery_note):
 def make_sales_invoice(source_name, target_doc=None):
 	invoiced_qty_map = get_invoiced_qty_map(source_name)
 
+
 	def update_accounts(source, target):
 		target.is_pos = 0
 		target.ignore_pricing_rule = 1
@@ -356,6 +357,8 @@ def make_sales_invoice(source_name, target_doc=None):
 
 	def update_item(source_doc, target_doc, source_parent):
 		target_doc.qty = source_doc.qty - invoiced_qty_map.get(source_doc.name, 0)
+
+
 
 	doc = get_mapped_doc("Delivery Note", source_name, 	{
 		"Delivery Note": {
@@ -388,6 +391,14 @@ def make_sales_invoice(source_name, target_doc=None):
 			"add_if_empty": True
 		}
 	}, target_doc, update_accounts)
+
+	#Start of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+	local_branch = frappe.db.get_value("Delivery Note",source_name,"branch")
+	local_si_naming_series = frappe.db.get_value("Branch",local_branch,"sales_invoice_naming_series")
+	#frappe.throw(_("Sum of points for all goals should be 100. It is {0}").format(local_si_naming_series))
+	doc.naming_series = local_si_naming_series
+	#End of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+
 
 	return doc
 

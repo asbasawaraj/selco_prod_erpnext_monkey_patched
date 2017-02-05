@@ -1,4 +1,4 @@
-# Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
+	# Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 # License: GNU General Public License v3. See license.txt
 
 from __future__ import unicode_literals
@@ -68,7 +68,25 @@ class PurchaseReceipt(BuyingController):
 		self.create_raw_materials_supplied("supplied_items")
 		self.set_landed_cost_voucher_amount()
 		self.update_valuation_rate("items")
+		#Inserted By basawaraj On 4th July for Ticket 2 On bitBucket
+		selco_cost_center = frappe.db.get_value("Warehouse",self.godown,"cost_center")
+		#frappe.msgprint(_("{0} subscribers added").format(selco_cost_center))
+		for d in self.get('items'):
+			d.cost_center = selco_cost_center
+		for d in self.get('taxes'):
+			d.cost_center = selco_cost_center
+		#End of Insert By basawaraj On 4th July for Ticket 2 On bitBucket
+		#Inserted By basawaraj On 7th september for printing the list of PO when PR is done by importing items from multiple PO
 
+		po_list = []
+		po_list_date = []
+		for item_selco in self.items:
+			if item_selco.prevdoc_docname not in po_list:
+				po_list.append(item_selco.prevdoc_docname)
+				po_list_date.append(frappe.utils.formatdate(frappe.db.get_value('Purchase Order', item_selco.prevdoc_docname, 'transaction_date'),"dd-MM-yyyy"))
+		self.selco_list_of_po= ','.join([str(i) for i in po_list])
+		self.selco_list_of_po_date= ','.join([str(i) for i in po_list_date])
+		#End of Insert By basawaraj On 7th september for printing the list of PO when PR is done by importing items from multiple PO
 
 	def set_landed_cost_voucher_amount(self):
 		for d in self.get("items"):

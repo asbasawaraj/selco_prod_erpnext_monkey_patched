@@ -58,7 +58,7 @@ class Lead(SellingController):
 	def check_email_id_is_unique(self):
 		if self.email_id:
 			# validate email is unique
-			duplicate_leads = frappe.db.sql_list("""select name from tabLead 
+			duplicate_leads = frappe.db.sql_list("""select name from tabLead
 				where email_id=%s and name!=%s""", (self.email_id, self.name))
 
 			if duplicate_leads:
@@ -91,6 +91,11 @@ def _make_customer(source_name, target_doc=None, ignore_permissions=False):
 			target.customer_name = source.lead_name
 
 		target.customer_group = frappe.db.get_default("Customer Group")
+		#Start of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+		local_branch = frappe.db.get_value("Lead",source_name,"branch")
+		#frappe.throw(_("Sum of points for all goals should be 100. It is {0}").format(local_branch))
+		target.naming_series = frappe.db.get_value("Branch",local_branch,"customer_naming_series")
+		#End of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
 
 	doclist = get_mapped_doc("Lead", source_name,
 		{"Lead": {
@@ -121,6 +126,13 @@ def make_opportunity(source_name, target_doc=None):
 			}
 		}}, target_doc)
 
+	#Start of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+	local_branch = frappe.db.get_value("Lead",source_name,"branch")
+	#frappe.throw(_("Sum of points for all goals should be 100. It is {0}").format(local_branch))
+	local_opp_naming_series = frappe.db.get_value("Branch",local_branch,"opportunity_naming_series")
+	target_doc.naming_series = local_opp_naming_series
+	#End of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+
 	return target_doc
 
 @frappe.whitelist()
@@ -134,6 +146,12 @@ def make_quotation(source_name, target_doc=None):
 			}
 		}}, target_doc)
 	target_doc.quotation_to = "Lead"
+#Start of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+	local_branch = frappe.db.get_value("Lead",source_name,"branch")
+	#frappe.throw(_("Sum of points for all goals should be 100. It is {0}").format(local_branch))
+	local_qtn_naming_series = frappe.db.get_value("Branch",local_branch,"quotation_naming_series")
+	target_doc.naming_series = local_qtn_naming_series
+#End of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
 
 	return target_doc
 

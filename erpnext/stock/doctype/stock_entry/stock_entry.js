@@ -64,6 +64,14 @@ erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 	},
 
 	refresh: function() {
+
+		//start of insert by Basawaraj on 2nd Nov
+			 {
+					cur_frm.add_custom_button(__("Get Items from IBM"),
+						cur_frm.cscript.get_items_from_ibm1, "icon-sitemap", "btn-default");
+				}
+		//End of insert by Basawaraj on 2nd Nov
+
 		var me = this;
 		erpnext.toggle_naming_series();
 		this.toggle_related_fields(this.frm.doc);
@@ -76,6 +84,65 @@ erpnext.stock.StockEntry = erpnext.stock.StockController.extend({
 
 	on_submit: function() {
 		this.clean_up();
+	},
+	get_items_from_ibm1: function() {
+		var d = new frappe.ui.Dialog({
+			title: __("Get Items from IBM"),
+			fields: [
+				{"fieldname":"ibm", "fieldtype":"Link", "label":__("IBM"),
+					options:"Material Request", reqd: 1, get_query: function(){
+						//return {filters: { workflow_state:"Approved - IBM",branch:cur_frm.doc.branch}}
+						//return {filters: { workflow_state:["in", ["Approved - IBM", "Partially Dispatched From Godown - IBM"]] ,branch:cur_frm.doc.branch}}
+						return {filters: {branch:cur_frm.doc.branch}}
+					}},
+				{fieldname:"fetch", "label":__("Get Items from IBM"), "fieldtype":"Button"}
+			]
+		});
+		d.get_input("fetch").on("click", function() {
+			var values = d.get_values();
+			console.log(values.ibm)
+		//	frappe.msgprint("Hello");
+			if(!values) return;
+			frappe.call({
+				"method": "frappe.client.get",
+				args: {
+					doctype: "Material Request",
+					name:values.ibm
+				},
+				callback: function (data) {
+				/*	console.log("hello")
+					//console.log(data.message.items[0])
+				  var newrow = frappe.model.add_child(cur_frm.doc,"Stock Entry Detail", "items");
+				  newrow.item_code=data.message.items[0].item_code;
+				  newrow.qty=data.message.items[0].qty;
+				  newrow.uom=data.message.items[0].uom;
+*/
+          console.log(data.message);
+					if (data.message) {
+          console.log(data.message.items.length);
+
+					for (i=0;i<data.message.items.length;i++)
+					{
+			    var newrow = frappe.model.add_child(cur_frm.doc,"Stock Entry Detail", "items");
+					newrow.item_code=data.message.items[i].item_code;
+					newrow.item_name=data.message.items[i].item_name;
+					newrow.qty=data.message.items[i].qty;
+					newrow.transfer_qty=data.message.items[i].qty;
+					newrow.uom=data.message.items[i].uom;
+					newrow.stock_uom=data.message.items[i].uom;
+					newrow.conversion_factor=1;
+
+					console.log(data.message.items[i]);
+					}
+
+					}
+					refresh_field("items");
+					d.hide();
+			}
+			})
+
+		});
+		d.show();
 	},
 
 	after_cancel: function() {

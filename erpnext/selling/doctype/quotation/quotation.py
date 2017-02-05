@@ -96,6 +96,11 @@ def _make_sales_order(source_name, target_doc=None, ignore_permissions=False):
 		target.run_method("set_missing_values")
 		target.run_method("calculate_taxes_and_totals")
 
+		#Start of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+		local_branch = frappe.db.get_value("Quotation",source_name,"branch")
+		target.naming_series = frappe.db.get_value("Branch",local_branch,"sales_order_naming_series")
+		#End of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+
 	doclist = get_mapped_doc("Quotation", source_name, {
 			"Quotation": {
 				"doctype": "Sales Order",

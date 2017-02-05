@@ -357,6 +357,11 @@ def make_material_request(source_name, target_doc=None):
 		}
 	}, target_doc, postprocess)
 
+	#Start of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+	local_branch = frappe.db.get_value("Sales Order",source_name,"branch")
+	doc.naming_series = frappe.db.get_value("Branch",local_branch,"material_request_naming_series")
+	#End of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+
 	return doc
 
 @frappe.whitelist()
@@ -369,6 +374,11 @@ def make_delivery_note(source_name, target_doc=None):
 				target.po_no = ", ".join(list(set(target_po_no))) if len(target_po_no) > 1 else target_po_no[0]
 			else:
 				target.po_no = source.po_no
+
+		#Start of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+		local_branch = frappe.db.get_value("Sales Order",source_name,"branch")
+		target.naming_series = frappe.db.get_value("Branch",local_branch,"delivery_note_naming_series")
+		#End of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
 
 		target.ignore_pricing_rule = 1
 		target.run_method("set_missing_values")
@@ -421,6 +431,12 @@ def make_sales_invoice(source_name, target_doc=None, ignore_permissions=False):
 		target.flags.ignore_permissions = True
 		target.run_method("set_missing_values")
 		target.run_method("calculate_taxes_and_totals")
+
+		#Start of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+		local_branch = frappe.db.get_value("Sales Order",source_name,"branch")
+		target.naming_series = frappe.db.get_value("Branch",local_branch,"sales_invoice_naming_series")
+		#End of code by Basawaraj on 4th for auto population quotation naming series when created from Lead
+
 
 	def update_item(source, target, source_parent):
 		target.amount = flt(source.amount) - flt(source.billed_amt)

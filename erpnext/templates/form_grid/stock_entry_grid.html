@@ -8,7 +8,10 @@
 		<div class="col-sm-5 col-xs-4">{%= __("Item") %}</div>
 		<div class="col-sm-3 col-xs-4">{%= __("Warehouse") %}</div>
 		<div class="col-sm-2 col-xs-2 text-right">{%= __("Qty") %}</div>
+
+		<!--start of comment by Basawaraj
 		<div class="col-sm-2 col-xs-2 text-right">{%= __("Amount") %}</div>
+	End of comment by Basawaraj-->
 	</div>
 {% } else { %}
 	<div class="row">
@@ -40,11 +43,14 @@
 		</div>
 
 		<!-- amount -->
+		<!--start of comment by Basawaraj
 		<div class="col-sm-2 col-xs-2 text-right">
 			{%= doc.get_formatted("amount") %}
 			<div class="small text-muted">
 				{%= doc.get_formatted("valuation_rate") %}
 			</div>
 		</div>
+		End of comment by Basawaraj-->
+		
 	</div>
 {% } %}

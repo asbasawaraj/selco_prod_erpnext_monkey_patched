@@ -64,6 +64,15 @@ def get_data():
 					"label": _("Support Analytics"),
 					"icon": "icon-bar-chart"
 				},
+				{
+					"type": "report",
+					"name": "Complaint Rejected By CSD",
+					"label": _("Complaint Rejected By CSD"),
+					"doctype": "Issue",
+					"is_query_report": True,
+					"icon": "icon-bar-chart"
+				},
+				
 			]
 		},
 	]

@@ -52,7 +52,7 @@ erpnext.buying.MaterialRequestController = erpnext.buying.BuyingController.exten
 				if(doc.material_request_type === "Purchase")
 					cur_frm.add_custom_button(__("Supplier Quotation"),
 					this.make_supplier_quotation, __("Make"));
-				
+
 				if(doc.material_request_type === "Manufacture" && doc.status === "Submitted")
 					cur_frm.add_custom_button(__("Production Order"),
 					this.raise_production_orders, __("Make"));
@@ -110,6 +110,9 @@ erpnext.buying.MaterialRequestController = erpnext.buying.BuyingController.exten
 					}},
 				{"fieldname":"warehouse", "fieldtype":"Link", "label":__("Warehouse"),
 					options:"Warehouse", reqd: 1, label:"For Warehouse"},
+//Start of code added by Basawaraj for quantity field in 'Get Items from BOM' screen
+				{fieldname:"Quantity", "label":__("Quantity"), "fieldtype":"Int",reqd: 1},
+//End of code added by Basawaraj for quantity field in 'Get Items from BOM' screen
 				{"fieldname":"fetch_exploded", "fieldtype":"Check",
 					"label":__("Fetch exploded BOM (including sub-assemblies)"), "default":1},
 				{fieldname:"fetch", "label":__("Get Items from BOM"), "fieldtype":"Button"}
@@ -129,7 +132,10 @@ erpnext.buying.MaterialRequestController = erpnext.buying.BuyingController.exten
 						d.description = item.description;
 						d.warehouse = values.warehouse;
 						d.uom = item.stock_uom;
-						d.qty = item.qty;
+//End of code added by Basawaraj for quantity field calculation
+						d.qty = item.qty * values.Quantity;
+//End of code added by Basawaraj for quantity field calculation
+//						d.qty = item.qty;
 					});
 					d.hide();
 					refresh_field("items");
